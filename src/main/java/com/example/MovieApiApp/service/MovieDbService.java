@@ -16,4 +16,8 @@ public class MovieDbService {
     public List<MovieEntity> getAllMovies(){
         return repository.findAll();
     }
+
+    public void saveMovie(MovieEntity movieEntity){
+        repository.save(movieEntity);
+    }
 }
