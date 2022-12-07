@@ -1,36 +1,44 @@
 package com.example.MovieApiApp.client;
 
+import com.example.MovieApiApp.config.OMDbClientConfig;
 import com.example.MovieApiApp.domain.Movie;
 import com.example.MovieApiApp.dto.MovieDto;
+import com.example.MovieApiApp.exception.MovieNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponentsBuilder;
+
+import java.net.URI;
+import java.util.Optional;
 
 @Component
 @RequiredArgsConstructor
 public class OMDbClient {
 
     private final RestTemplate restTemplate;
+    private final OMDbClientConfig omDbClientConfig;
 
-    @Value("${omdb.api.key}")
-    private String omdbApiKey;
+    public MovieDto getMovieByTitle(String title) throws MovieNotFoundException{
 
-    @Value("${omdb.api.endpoint}")
-    private String omdbApiEndpoint;
-
-
-
-    public MovieDto getMovieByTitle(String title){
-
-        MovieDto movieDto =
-                restTemplate.getForObject(omdbApiEndpoint + "?t=" + title + "&apikey=" + omdbApiKey,
-                MovieDto.class);
+        URI url = UriComponentsBuilder.fromHttpUrl(omDbClientConfig.getOmdbApiEndpoint() + "?t=" + title + "&apikey=" + omDbClientConfig.getOmdbApiKey())
+                .build()
+                .encode()
+                .toUri();
 
 
-        System.out.println(movieDto.getTitle());
 
-        return movieDto;
+        MovieDto movieDto = restTemplate.getForObject(url, MovieDto.class);
+        Optional<String> optionalTitle = Optional.ofNullable(movieDto.getTitle());
+
+
+        if (optionalTitle.isPresent()){
+            return movieDto;
+        }else {
+            throw new MovieNotFoundException();
+        }
+
 
     }
 

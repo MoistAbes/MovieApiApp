@@ -3,6 +3,7 @@ package com.example.MovieApiApp.controller;
 import com.example.MovieApiApp.client.OMDbClient;
 import com.example.MovieApiApp.dto.MovieDto;
 import com.example.MovieApiApp.entity.MovieEntity;
+import com.example.MovieApiApp.exception.MovieNotFoundException;
 import com.example.MovieApiApp.mapper.MovieMapper;
 import com.example.MovieApiApp.service.MovieDbService;
 import lombok.RequiredArgsConstructor;
@@ -27,21 +28,29 @@ public class MovieController {
 
     private static Logger logger = LogManager.getLogger(MovieController.class);
 
-    @GetMapping
+    @GetMapping(value = "/favourites")
     public ResponseEntity<List<MovieDto>> getMovies(){
         logger.info("USING GET ENDPOINT");
         return ResponseEntity.ok(mapper.mapToMovieDtoList(service.getAllMovies()));
     }
 
     @GetMapping(value = "/{title}")
-    public ResponseEntity<MovieDto> getMovie(@PathVariable String title){
+    public ResponseEntity<MovieDto> getMovie(@PathVariable String title) throws MovieNotFoundException {
         logger.info("USING GET /TITLE ENDPOINT");
-        return ResponseEntity.ok(omDbClient.getMovieByTitle(title));
+        MovieDto movieDto = omDbClient.getMovieByTitle(title);
+        return ResponseEntity.ok(movieDto);
     }
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Void> addMovie(@RequestBody MovieDto movieDto){
         MovieEntity movieEntity = mapper.mapToMovieEntity(movieDto);
+        service.saveMovie(movieEntity);
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping(value = "/{title}")
+    public ResponseEntity<Void> addMovieToFavourites(@PathVariable String title) throws MovieNotFoundException{
+        MovieEntity movieEntity = mapper.mapToMovieEntity(omDbClient.getMovieByTitle(title));
         service.saveMovie(movieEntity);
         return ResponseEntity.ok().build();
     }
