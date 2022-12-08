@@ -50,7 +50,4 @@ public class MovieEntity {
     @NotNull
     @Column(name = "poster")
     private String poster;
-
-
-
 }

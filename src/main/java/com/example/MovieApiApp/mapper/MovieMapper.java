@@ -3,7 +3,6 @@ package com.example.MovieApiApp.mapper;
 import com.example.MovieApiApp.dto.MovieDto;
 import com.example.MovieApiApp.entity.MovieEntity;
 import org.springframework.stereotype.Service;
-
 import java.util.List;
 import java.util.stream.Collectors;
 

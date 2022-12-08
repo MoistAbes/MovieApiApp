@@ -26,17 +26,13 @@ public class MovieController {
     private final MovieDbService service;
     private final MovieMapper mapper;
 
-    private static Logger logger = LogManager.getLogger(MovieController.class);
-
     @GetMapping(value = "/favourites")
     public ResponseEntity<List<MovieDto>> getMovies(){
-        logger.info("USING GET ENDPOINT");
         return ResponseEntity.ok(mapper.mapToMovieDtoList(service.getAllMovies()));
     }
 
     @GetMapping(value = "/{title}")
     public ResponseEntity<MovieDto> getMovie(@PathVariable String title) throws MovieNotFoundException {
-        logger.info("USING GET /TITLE ENDPOINT");
         MovieDto movieDto = omDbClient.getMovieByTitle(title);
         return ResponseEntity.ok(movieDto);
     }
